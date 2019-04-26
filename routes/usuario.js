@@ -4,6 +4,9 @@ var bcrypt = require('bcryptjs');
 // modelo del usuario
 var Usuario = require('./../models/usuario');
 
+let jwt = require('jsonwebtoken');
+let SEED = require('../config/config').SEED;
+
 var app = express();
 
 //===========================
@@ -29,6 +32,23 @@ app.get('/', (req, res, next) => {
         )
 });
 
+//===========================
+// Verificar token middleware      
+//===========================
+app.use('/', (req, res, next) => {
+    let token = req.query.token;
+    jwt.verify(token, SEED, (err, decoded) => {
+        if (err) {
+            return res.status(200).json({
+                ok: false,
+                mensaje: 'Token no válido',
+                errors: err
+            });
+        }
+    });
+    next();
+});
+
 //========================
 // Actualizar usuario       
 //========================
@@ -44,7 +64,7 @@ app.put('/:id', (req, res) => {
                 errors: err
             });
         }
-        if(!usuario) {
+        if (!usuario) {
             return res.status(400).json({
                 ok: false,
                 mensaje: `El usuario con el id ${id} no existe`,
@@ -53,7 +73,7 @@ app.put('/:id', (req, res) => {
                 }
             });
         }
-        
+
         usuario.nombre = body.nombre;
         usuario.email = body.email;
         usuario.role = body.role;
@@ -67,14 +87,14 @@ app.put('/:id', (req, res) => {
                     mensaje: 'Error al actualizar usuario',
                     errors: err
                 });
-            } 
+            }
             res.status(200).json({
                 ok: true,
                 usuario: usuarioGuardado
-            });            
+            });
         })
     })
-    
+
 });
 
 
@@ -134,13 +154,13 @@ app.delete('/:id', (req, res) => {
                 }
             });
         }
-       
+
         res.status(200).json({
             ok: true,
             usuario: usuarioBorrado
-        });            
+        });
     });
-    
+
 });
 
 module.exports = app;
