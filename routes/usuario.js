@@ -1,6 +1,7 @@
 var express = require('express');
 // Librería para encriptar la password
 var bcrypt = require('bcryptjs');
+// modelo del usuario
 var Usuario = require('./../models/usuario');
 
 var app = express();
@@ -56,6 +57,8 @@ app.put('/:id', (req, res) => {
         usuario.nombre = body.nombre;
         usuario.email = body.email;
         usuario.role = body.role;
+
+        usuario.password = ':)';
 
         usuario.save((err, usuarioGuardado) => {
             if (err) {
