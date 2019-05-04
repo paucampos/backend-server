@@ -1,15 +1,17 @@
 // Requires
-var express = require('express');
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
+let express = require('express');
+let mongoose = require('mongoose');
+let bodyParser = require('body-parser');
 
 // importar rutas
-var appRoutes = require('./routes/app');
-var usuarioRoutes = require('./routes/usuario');
-var loginRoutes = require('./routes/login');
+let appRoutes = require('./routes/app');
+let usuarioRoutes = require('./routes/usuario');
+let hospitalRoutes = require('./routes/hospital');
+let medicoRoutes = require('./routes/medico');
+let loginRoutes = require('./routes/login');
 
 // Inicializar variables
-var app = express();
+let app = express();
 
 // Body parser
 // parse application/x-ww-form-urlencoded
@@ -25,6 +27,8 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
 // rutas -> Middelware
 app.use('/login', loginRoutes);
 app.use('/usuario', usuarioRoutes);
+app.use('/hospital', hospitalRoutes);
+app.use('/medico', medicoRoutes);
 app.use('/', appRoutes);
 
 
