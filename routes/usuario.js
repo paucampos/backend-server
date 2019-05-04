@@ -11,7 +11,15 @@ let app = express();
 // Obtener todos los usuarios
 //===========================
 app.get('/', (req, res, next) => {
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Usuario.find({}, 'nombre email img role')
+        // Que se salte la cantidad desde que viene por la query
+        .skip(desde)
+        // Paginación limitada a 5
+        .limit(5)
         .exec(
             (err, usuarios) => {
                 if (err) {
@@ -21,10 +29,20 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-
-                res.status(200).json({
-                    ok: true,
-                    usuarios: usuarios
+                // Agregar contador de usuarios
+                Usuario.count({}, (error, conteo) => {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error al contar usuarios',
+                            errors: error
+                        })
+                    }
+                    res.status(200).json({
+                        ok: true,
+                        total: conteo,
+                        usuarios: usuarios
+                    });
                 });
             }
         )

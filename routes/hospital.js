@@ -7,11 +7,19 @@ let mdAutenticacion = require('../middlewares/autenticacion');
 
 let app = express();
 
-//===========================
+//=============================
 // Obtener todos los hospitales
-//===========================
+//=============================
 app.get('/', (req, res, next) => {
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Hospital.find({})
+        // Que se salte la cantidad desde que viene por la query
+        .skip(desde)
+        // Paginación limitada a 5
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, hospitales) => {
                 if (err) {
@@ -22,9 +30,19 @@ app.get('/', (req, res, next) => {
                     });
                 }
 
-                res.status(200).json({
-                    ok: true,
-                    hospitales: hospitales
+                Hospital.count({}, (error, conteo) => {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error al contar hospitales',
+                            errors: error
+                        })
+                    }
+                    res.status(200).json({
+                        ok: true,
+                        total: conteo,
+                        hospitales: hospitales
+                    });
                 });
             }
         )

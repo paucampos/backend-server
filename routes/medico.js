@@ -10,7 +10,16 @@ let app = express();
 // Obtener todos los medicos
 //===========================
 app.get('/', (req, res, next) => {
-    Medico.find({}, 'nombre img usuario hospital')
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    Medico.find({})
+        // Se salte la cantidad 'desde' que viene por la query
+        .skip(desde)
+        // Paginación limitada a 5
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('hospital')
         .exec(
             (err, medicos) => {
                 if (err) {
@@ -20,10 +29,19 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-
-                res.status(200).json({
-                    ok: true,
-                    medicos: medicos
+                Medico.count({}, (error, conteo) => {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error al contar medicos',
+                            errors: error
+                        })
+                    }
+                    res.status(200).json({
+                        ok: true,
+                        total: conteo,
+                        medicos: medicos
+                    });
                 });
             }
         )
@@ -55,6 +73,8 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         }
 
         medico.nombre = body.nombre;
+        medico.usuario = req.usuario._id;
+        medico.hospital = body.hospital;
 
         medico.save((err, medicoGuardado) => {
             if (err) {
@@ -67,7 +87,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             res.status(200).json({
                 ok: true,
                 medico: medicoGuardado,
-                usuarioToken: req.usuario
+                // usuarioToken: req.usuario
             });
         })
     })
@@ -83,8 +103,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     let medico = new Medico({
         nombre: body.nombre,
-        img: body.img,
-        usuario: body.usuario,
+        usuario: req.usuario._id,
         hospital: body.hospital
     });
 
@@ -100,7 +119,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         res.status(201).json({
             ok: true,
             medico: medicoGuardado,
-            usuarioToken: req.usuario
+            // usuarioToken: req.usuario
         });
     })
 });
@@ -111,7 +130,6 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 //============================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
     let id = req.params.id;
-    let body = req.body;
 
     Medico.findByIdAndRemove(id, (err, medicoBorrado) => {
         if (err) {
@@ -135,7 +153,7 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
         res.status(200).json({
             ok: true,
             medico: medicoBorrado,
-            usuarioToken: req.usuario
+            // usuarioToken: req.usuario
         });
     });
 

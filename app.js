@@ -2,6 +2,8 @@
 let express = require('express');
 let mongoose = require('mongoose');
 let bodyParser = require('body-parser');
+const { DB_HOST, DB_PORT, DB_NAME } = require('./config/config');
+const connectionUrl = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 
 // importar rutas
 let appRoutes = require('./routes/app');
@@ -19,9 +21,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 // Conexion a la base de datos
-mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) => {
+mongoose.connection.openUri(connectionUrl, { useNewUrlParser: true, useCreateIndex: true }, (err, res) => {
     if (err) throw err;
-    console.log('Base de datos on port 27017: \x1b[32m%s\x1b[0m', 'online');
+    console.log(`Base de datos on port ${DB_PORT}: \x1b[32m%s\x1b[0m`, 'online');
 });
 
 // rutas -> Middelware

@@ -1,6 +1,6 @@
 let jwt = require('jsonwebtoken');
 
-let SEED = require('../config/config').SEED;
+const SEED = require('../config/config').SEED;
 
 
 //===========================
