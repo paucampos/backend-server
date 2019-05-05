@@ -11,12 +11,13 @@ let usuarioRoutes = require('./routes/usuario');
 let hospitalRoutes = require('./routes/hospital');
 let medicoRoutes = require('./routes/medico');
 let loginRoutes = require('./routes/login');
+let busquedaRoutes = require('./routes/busqueda');
 
 // Inicializar variables
 let app = express();
 
 // Body parser
-// parse application/x-ww-form-urlencoded
+// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
@@ -31,6 +32,7 @@ app.use('/login', loginRoutes);
 app.use('/usuario', usuarioRoutes);
 app.use('/hospital', hospitalRoutes);
 app.use('/medico', medicoRoutes);
+app.use('/busqueda', busquedaRoutes);
 app.use('/', appRoutes);
 
 
