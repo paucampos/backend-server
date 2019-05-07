@@ -30,7 +30,7 @@ app.get('/', (req, res, next) => {
                     });
                 }
                 // Agregar contador de usuarios
-                Usuario.count({}, (error, conteo) => {
+                Usuario.countDocuments({}, (error, conteo) => {
                     if (error) {
                         return res.status(500).json({
                             ok: false,
@@ -76,7 +76,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         usuario.nombre = body.nombre;
         usuario.email = body.email;
         usuario.role = body.role;
-
         usuario.password = ':)';
 
         usuario.save((err, usuarioGuardado) => {
@@ -92,7 +91,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
                 usuario: usuarioGuardado,
                 usuarioToken: req.usuario
             });
-        })
+        });
     })
 
 });

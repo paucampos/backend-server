@@ -1,20 +1,21 @@
 // Requires
-let express = require('express');
-let mongoose = require('mongoose');
-let bodyParser = require('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const { DB_HOST, DB_PORT, DB_NAME } = require('./config/config');
 const connectionUrl = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
 
 // importar rutas
-let appRoutes = require('./routes/app');
-let usuarioRoutes = require('./routes/usuario');
-let hospitalRoutes = require('./routes/hospital');
-let medicoRoutes = require('./routes/medico');
-let loginRoutes = require('./routes/login');
-let busquedaRoutes = require('./routes/busqueda');
+const appRoutes = require('./routes/app');
+const usuarioRoutes = require('./routes/usuario');
+const hospitalRoutes = require('./routes/hospital');
+const medicoRoutes = require('./routes/medico');
+const loginRoutes = require('./routes/login');
+const busquedaRoutes = require('./routes/busqueda');
+const uploadRoutes = require('./routes/upload');
 
 // Inicializar variables
-let app = express();
+const app = express();
 
 // Body parser
 // parse application/x-www-form-urlencoded
@@ -33,6 +34,7 @@ app.use('/usuario', usuarioRoutes);
 app.use('/hospital', hospitalRoutes);
 app.use('/medico', medicoRoutes);
 app.use('/busqueda', busquedaRoutes);
+app.use('/upload', uploadRoutes);
 app.use('/', appRoutes);
 
 
