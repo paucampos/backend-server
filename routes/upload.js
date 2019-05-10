@@ -9,7 +9,6 @@ const Usuario = require('./../models/usuario');
 
 const app = express();
 
-
 // Opciones por default de fileUpload
 app.use(fileUpload());
 
@@ -56,8 +55,12 @@ app.put('/:tipo/:id', (req, res, next) => {
     let nombrePersonalizado = `${id}-${new Date().getMilliseconds()}.${extension}`;
     let path = `./uploads/${tipo}/${nombrePersonalizado}`;
 
-    // Usar el metodo mv() para mover el archivo a algún lugar en mi servidor
-    archivo.mv(path, function(err) {
+    subirPorTipo(archivo, path, tipo, id, nombrePersonalizado, res);
+});
+
+// Usar el metodo mv() para mover el archivo a mi servidor
+function moverArchivo(archivo, path) {
+    archivo.mv(path, err => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -68,15 +71,13 @@ app.put('/:tipo/:id', (req, res, next) => {
                 }
             });
         }
-        subirPorTipo(tipo, id, nombrePersonalizado, res);
     });
-});
-
+}
 
 //===============
 // Subir por tipo
 //===============
-function subirPorTipo(tipo, id, nombrePersonalizado, res) {
+function subirPorTipo(archivo, path, tipo, id, nombrePersonalizado, res) {
     switch (tipo.toLowerCase()) {
         case 'usuarios':
             esquema = Usuario;
@@ -89,24 +90,20 @@ function subirPorTipo(tipo, id, nombrePersonalizado, res) {
             break;
     }
 
-    esquema.findById(id, (err, respuesta) => {
-        if (!respuesta) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: `No se encontró lo que buscabas en los ${tipo}`,
-                errors: { message: `No se encontró lo que buscabas en los ${tipo}` }
-            });
-        }
+    esquema.findById(id, path, (err, respuesta) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: `El ID: ${id} no es válido`,
+                mensaje: `El ID: ${id} no es válido en el tipo ${tipo}`,
                 errors: {
-                    message: `El ID: ${id} no es válido`,
+                    message: `El ID: ${id} no es válido en el tipo ${tipo}`,
                     err
                 }
             });
         }
+
+        moverArchivo(archivo, path);
+
         const imagen = respuesta.img;
         const pathViejo = `./uploads/${tipo}/${imagen}`;
 
@@ -141,6 +138,7 @@ function subirPorTipo(tipo, id, nombrePersonalizado, res) {
             });
         });
     });
+
 }
 
 module.exports = app;
