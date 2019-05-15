@@ -13,6 +13,7 @@ const medicoRoutes = require('./routes/medico');
 const loginRoutes = require('./routes/login');
 const busquedaRoutes = require('./routes/busqueda');
 const uploadRoutes = require('./routes/upload');
+const imagenesRoutes = require('./routes/imagenes');
 
 // Inicializar variables
 const app = express();
@@ -35,6 +36,7 @@ app.use('/hospital', hospitalRoutes);
 app.use('/medico', medicoRoutes);
 app.use('/busqueda', busquedaRoutes);
 app.use('/upload', uploadRoutes);
+app.use('/img', imagenesRoutes);
 app.use('/', appRoutes);
 
 
