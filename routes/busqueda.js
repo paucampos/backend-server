@@ -97,7 +97,7 @@ function buscarMedicos(regex) {
 // Realizar una búsqueda en la tabla usuarios
 function buscarUsuarios(regex) {
     return new Promise((resolve, reject) => {
-        Usuario.find({}, 'nombre email role')
+        Usuario.find({}, 'nombre email role google')
             .or([{ 'nombre': regex }, { 'email': regex }])
             .exec((err, usuarios) => {
                 if (!err) {

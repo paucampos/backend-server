@@ -61,7 +61,7 @@ app.post('/google', async(req, res) => {
             if (usuarioBD.google === false) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Debe de usar su autenticación normal'
+                    mensaje: 'Debe usar su autenticación normal'
                 });
             } else {
                 let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
@@ -83,23 +83,26 @@ app.post('/google', async(req, res) => {
             usuario.password = ':)';
 
             usuario.save((err, usuarioBD) => {
-                let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
+                console.log("usuarioBD:::", usuarioBD);
 
-                res.status(200).json({
-                    ok: true,
-                    usuario: usuarioBD,
-                    token,
-                    id: usuarioBD._id
-                });
+                if (err) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Hubo un problema con su usuario, intente nuevamente'
+                    });
+                } else {
+                    let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
+
+                    res.status(200).json({
+                        ok: true,
+                        usuario: usuarioBD,
+                        token,
+                        id: usuarioBD._id
+                    });
+                }
             });
         }
     });
-
-    // return res.status(200).json({
-    //     ok: true,
-    //     mensaje: 'Todo ok',
-    //     googleUser
-    // });
 });
 
 
