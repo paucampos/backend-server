@@ -12,11 +12,11 @@ let app = express();
 //===========================
 app.get('/', (req, res, next) => {
 
-    var desde = req.query.desde || 0;
+    let desde = req.query.desde || 0;
     desde = Number(desde);
 
     Usuario.find({}, 'nombre email img role google')
-        // Que se salte la cantidad desde que viene por la query
+        // Que se salte la cantidad 'desde' que viene por la query
         .skip(desde)
         // Paginación limitada a 5
         .limit(5)
@@ -41,7 +41,7 @@ app.get('/', (req, res, next) => {
                     res.status(200).json({
                         ok: true,
                         total: conteo,
-                        usuarios: usuarios
+                        usuarios: usuarios.sort((a, b) => a.nombre.localeCompare(b.nombre))
                     });
                 });
             }
