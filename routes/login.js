@@ -38,7 +38,7 @@ async function verify(token) {
 }
 
 app.post('/google', async(req, res) => {
-    let token = req.body.token;
+    let token = req.body.token || 'XXX';
 
     let googleUser = await verify(token)
         .catch(error => {
@@ -48,35 +48,39 @@ app.post('/google', async(req, res) => {
             });
         })
 
-    Usuario.findOne({ email: googleUser.email }, (err, usuarioBD) => {
+    Usuario.findOne({ email: googleUser.email }, (err, usuario) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar usuario',
+                mensaje: 'Error al buscar usuario - login',
                 errors: err
             });
         }
 
-        if (usuarioBD) {
-            if (usuarioBD.google === false) {
+        if (usuario) {
+            if (usuario.google === false) {
                 return res.status(400).json({
                     ok: false,
                     mensaje: 'Debe usar su autenticación normal'
                 });
             } else {
-                let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
+                usuario.password = ':)';
+
+                let token = jwt.sign({ usuario: usuario }, SEED, { expiresIn: 14400 }); // 4 horas
 
                 res.status(200).json({
                     ok: true,
-                    usuario: usuarioBD,
+                    usuario: usuario,
                     token,
-                    id: usuarioBD._id
+                    id: usuario._id,
+                    menu: obtenerMenu(usuario.role)
                 });
             }
         } else {
-            // El usuario no existe, hay que crearlo
+            // El usuario no existe por correo, hay que crearlo
             let usuario = new Usuario();
-            usuario.nombre = googleUser.nombre;
+
+            usuario.nombre = usuario.nombre;
             usuario.email = googleUser.email;
             usuario.img = googleUser.img;
             usuario.google = true;
@@ -86,20 +90,21 @@ app.post('/google', async(req, res) => {
                 console.log("usuarioBD:::", usuarioBD);
 
                 if (err) {
-                    return res.status(400).json({
+                    return res.status(500).json({
                         ok: false,
-                        mensaje: 'Hubo un problema con su usuario, intente nuevamente'
-                    });
-                } else {
-                    let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
-
-                    res.status(200).json({
-                        ok: true,
-                        usuario: usuarioBD,
-                        token,
-                        id: usuarioBD._id
+                        mensaje: 'Hubo un problema con su usuario -google, intente nuevamente',
+                        errors: err
                     });
                 }
+                let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
+
+                res.status(200).json({
+                    ok: true,
+                    usuario: usuarioBD,
+                    token,
+                    id: usuarioBD._id,
+                    menu: obtenerMenu(usuarioBD.role)
+                });
             });
         }
     });
@@ -142,16 +147,47 @@ app.post('/', (req, res) => {
 
         // Crear un JWT: json web token
         usuarioBD.password = ';)';
-        let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
 
+        let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
 
         res.status(200).json({
             ok: true,
             usuario: usuarioBD,
             token,
-            id: usuarioBD._id
+            id: usuarioBD._id,
+            menu: obtenerMenu(usuarioBD.role)
         });
     });
-})
+});
+
+function obtenerMenu(ROLE) {
+    let menu = [{
+            titulo: "Principal",
+            icono: "mdi mdi-gauge",
+            submenu: [
+                { titulo: "Dashboard", url: "/dashboard" },
+                { titulo: "ProgressBar", url: "/progress" },
+                { titulo: "Gráficas", url: "/graficas" },
+                { titulo: "Promesas", url: "/promesas" },
+                { titulo: "Rxjs", url: "/rxjs" }
+            ]
+        },
+        {
+            titulo: "Mantenimientos",
+            icono: "mdi mdi-folder-lock-open",
+            submenu: [
+                // { titulo: "Usuarios", url: "/usuarios" },
+                { titulo: "Hospitales", url: "/hospitales" },
+                { titulo: "Médicos", url: "/medicos" }
+            ]
+        }
+    ];
+    console.log(ROLE);
+    if (ROLE === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift({ titulo: "Usuarios", url: "/usuarios" });
+    }
+
+    return menu;
+}
 
 module.exports = app;
