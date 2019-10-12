@@ -29,3 +29,26 @@ exports.verificaToken = function(req, res, next) {
     });
 
 }
+
+//===========================
+// Verificar admin middleware      
+//===========================
+exports.verificaADMIN_ROLE = function(req, res, next) {
+
+    let usuario = req.usuario;
+
+    if (usuario.role === 'ADMIN_ROLE') {
+        next();
+        return;
+    } else {
+        return res.status(401).json({
+            ok: false,
+            mensaje: 'Token incorrecto - no es admin',
+            errors: {
+                message: 'No es admin, no puede hacer esto'
+            }
+        });
+    }
+
+
+}
