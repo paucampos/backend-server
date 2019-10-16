@@ -1,5 +1,5 @@
+/*jshint esversion: 8 */
 let express = require('express');
-
 // Librería para encriptar la password
 let bcrypt = require('bcryptjs');
 
@@ -34,11 +34,11 @@ async function verify(token) {
         email: payload.email,
         img: payload.picture,
         google: true
-    }
+    };
 }
 
 app.post('/google', async(req, res) => {
-    let token = req.body.token || 'XXX';
+    let token = req.body.token;
 
     let googleUser = await verify(token)
         .catch(error => {
@@ -46,7 +46,7 @@ app.post('/google', async(req, res) => {
                 ok: false,
                 mensaje: 'Token no válido'
             });
-        })
+        });
 
     Usuario.findOne({ email: googleUser.email }, (err, usuario) => {
         if (err) {
@@ -80,30 +80,28 @@ app.post('/google', async(req, res) => {
             // El usuario no existe por correo, hay que crearlo
             let usuario = new Usuario();
 
-            usuario.nombre = usuario.nombre;
+            usuario.nombre = googleUser.nombre;
             usuario.email = googleUser.email;
             usuario.img = googleUser.img;
             usuario.google = true;
             usuario.password = ':)';
 
-            usuario.save((err, usuarioBD) => {
-                console.log("usuarioBD:::", usuarioBD);
-
+            usuario.save((err, usuario) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Hubo un problema con su usuario -google, intente nuevamente',
+                        mensaje: 'Hubo un problema con su usuario - google, intente nuevamente',
                         errors: err
                     });
                 }
-                let token = jwt.sign({ usuario: usuarioBD }, SEED, { expiresIn: 14400 }); // 4 horas
+                let token = jwt.sign({ usuario: usuario }, SEED, { expiresIn: 14400 }); // 4 horas
 
                 res.status(200).json({
                     ok: true,
-                    usuario: usuarioBD,
+                    usuario: usuario,
                     token,
-                    id: usuarioBD._id,
-                    menu: obtenerMenu(usuarioBD.role)
+                    id: usuario._id,
+                    menu: obtenerMenu(usuario.role)
                 });
             });
         }

@@ -1,3 +1,4 @@
+/*jshint esversion: 8 */
 // Requires
 const express = require('express');
 const mongoose = require('mongoose');
@@ -30,10 +31,14 @@ app.use(function(req, res, next) {
 // Body parser
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // Conexion a la base de datos
-mongoose.connection.openUri(connectionUrl, { useNewUrlParser: true, useCreateIndex: true }, (err, res) => {
+mongoose.connection.openUri(connectionUrl, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+}, (err, res) => {
     if (err) throw err;
     console.log(`Base de datos on port ${DB_PORT}: \x1b[32m%s\x1b[0m`, 'online');
 });
