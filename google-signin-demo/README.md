@@ -1,6 +1,6 @@
 # Google-Singin-Demo
 
-Esta carpeta contiene un pqueño Front-End para
+Esta carpeta contiene un pequeño Front-End para
 obtener el token de Google y probarlo contra nuestro backend server.
 
 Recordar que es necesario reconstruir los módulos de node, en caso de que se quiera probar localmente

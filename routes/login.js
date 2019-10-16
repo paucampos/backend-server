@@ -129,7 +129,7 @@ app.post('/', (req, res) => {
         if (!usuarioBD) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Credenciales incorrectas - email',
+                mensaje: 'Credenciales incorrectas',
                 errors: err
             });
         }

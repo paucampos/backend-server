@@ -1,3 +1,5 @@
+/*jshint esversion: 8 */
+
 let express = require('express');
 // Librería para encriptar la password
 let bcrypt = require('bcryptjs');
@@ -36,7 +38,7 @@ app.get('/', (req, res, next) => {
                             ok: false,
                             mensaje: 'Error al contar usuarios',
                             errors: error
-                        })
+                        });
                     }
                     res.status(200).json({
                         ok: true,
@@ -45,7 +47,7 @@ app.get('/', (req, res, next) => {
                     });
                 });
             }
-        )
+        );
 });
 
 //========================
@@ -92,8 +94,7 @@ app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_RO
                 usuarioToken: req.usuario
             });
         });
-    })
-
+    });
 });
 
 
@@ -125,7 +126,7 @@ app.post('/', (req, res) => {
             usuario: usuarioGuardado,
             usuarioToken: req.usuario
         });
-    })
+    });
 });
 
 
